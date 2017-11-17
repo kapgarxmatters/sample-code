@@ -1,0 +1,4 @@
+These are examples of what can be executed to call the xmatters2.bat file to send info into xMatters.
+
+BMC Footprints - Business Rule - Action (The arguments on the end are sperated by two _  That is important because that is how xMatters splits the parameters in the inbound integration)
+cmd /k "C:\Users\Administrator\Desktop\xmatters2.bat -ExecutionPolicy Unrestricted" [description]__[ticket_number]__[priority]__[title]__TechSupport
