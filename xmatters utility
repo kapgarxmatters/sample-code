@@ -1,0 +1,65 @@
+/*
+ * Shared libraries allow you to write code once and reuse it in
+ * multiple scripts in the Integration Builder.
+ *
+ * This example shows you how to create a new function named 'myFunction'
+ * and add it to this shared library.
+ *
+ * To use this function in another script, include the following statements,
+ * replacing 'My Shared Libarary' with the name of this shared library.
+ *
+ *  var mySharedLibrary = require('My Shared Library');
+ *  var message = mySharedLibrary.myFunction();
+ */
+
+exports.myFunction = function() {
+    var msg = 'Hello World!';
+    console.log('myFunction says ' + msg);
+    return msg;
+};
+
+exports.getEvent = function(alarmname){
+    console.log("Query xMatters for Event");
+    var getRequest = http.request({
+        'endpoint': 'xMatters',
+        'method': 'GET',
+        'path': '/api/xm/1/events?propertyName=AlarmName%23en&propertyValue=' + alarmname,
+        'headers': {
+            'Content-Type': 'application/json'
+        }
+    });
+
+    var response = getRequest.write();
+    if (response.statusCode != 200 ) {
+        console.log('\nThere was an error updating the external system.\n');
+        return;
+    }
+    else {
+        return JSON.parse(response.body);
+    }
+};
+
+exports.terminateEvent = function(id){
+    console.log("Terminate xMatters for Event");
+    var terminateRequest = http.request({
+        'endpoint': 'xMatters',
+        'method': 'POST',
+        'path': '/api/xm/1/events/',
+        'headers': {
+            'Content-Type': 'application/json'
+        }
+    });
+   var data = {};
+    data.id = id;
+    data.status = 'TERMINATED';
+
+    var response = terminateRequest.write(data);
+    if (response.statusCode != 202 ) {
+        console.log('\nThere was an error updating the external system.\n');
+        return;
+    }
+    else {
+        return JSON.parse(response.body);
+    }
+    
+};
