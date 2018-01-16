@@ -1,3 +1,48 @@
+var xmattersLibrary = require('xMatters Utility');
+
+var data = JSON.parse( request.body );
+
+if( data.Type != "Notification" ){
+	console.log( 'Ignoring "' + data.Type + '"' );
+	return;
+}
+
+var message = JSON.parse( data.Message );
+
+if (message.NewStateValue == "OK"){
+   var xevents = xmattersLibrary.getEvent(message.AlarmName);
+   for (var i in xevents.data){
+       xmattersLibrary.terminateEvent(xevents.data[i].id);
+   }
+}
+else {
+    properties = {};
+    properties.Subject   = data.Subject;
+    
+    properties.AlarmName        = message.AlarmName;
+    properties.AlarmDescription = message.AlarmDescription;
+    properties.NewStateValue    = message.NewStateValue;
+    properties.OldStateValue    = message.OldStateValue;
+    properties.NewStateReason   = message.NewStateReason;
+    properties.Region           = message.Region;
+    
+    trigger.properties = properties;
+    
+    // Define recipients
+    var recipients = [];
+    recipients.push({'targetName': 'FTI-Systems-Monitoring'});
+    trigger.recipients = recipients;
+    
+    // Post trigger to form
+    form.post( trigger );
+}
+
+
+
+
+
+
+
 /*
  * Shared libraries allow you to write code once and reuse it in
  * multiple scripts in the Integration Builder.
